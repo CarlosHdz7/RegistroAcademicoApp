@@ -1,0 +1,15 @@
+﻿@page "/editarFacultad/{Id}"
+@using RegistroAcademicoApp.Shared
+@inject HttpClient http;
+<h1>Editar</h1>
+
+<FormularioFacultad facultadCls=facultadCls />
+
+@code { [Parameter]
+    public string Id { get; set; }
+
+    public FacultadCls facultadCls = new FacultadCls();
+    protected async override Task OnParametersSetAsync()
+    {
+        facultadCls = await http.GetFromJsonAsync<FacultadCls>("api/Facultad/obtenerFacultad/" + Id);
+    } }

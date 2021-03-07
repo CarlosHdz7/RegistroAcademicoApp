@@ -1,0 +1,57 @@
+﻿@page "/ListaFacultad"
+@using RegistroAcademicoApp.Shared
+@inject HttpClient http
+
+
+@code{ 
+    string[] cabecerasTabla = { "Id", "Facultad" }; 
+}
+
+<div class="@tipoMsg">
+    @msg
+</div>
+
+<Lista cabeceras=cabecerasTabla
+       lista=listaFacultades
+       eventEliminar="EliminarDatos"
+       eventBusqueda="BusquedaFacultad"
+       rtaAgregar="agregarFacultad"
+       rtaEditar="editarFacultad"
+       EditarOpt="true"
+       AgregarOpt="true"
+       MostrarEspera="true" />
+
+@code { 
+    
+    private string tipoMsg = "", msg = "";
+    private FacultadCls[] listaFacultades;
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaFacultades = await http.GetFromJsonAsync<FacultadCls[]>("api/Facultad/Get");
+    }
+
+    public async Task BusquedaFacultad(string data)
+    {
+        tipoMsg = ""; msg = "";
+        listaFacultades = await http.GetFromJsonAsync<FacultadCls[]>("api/Facultad/Filtrar/" + data);
+
+    }
+
+    public async Task EliminarDatos(string data)
+    {
+        int respuesta = await http.GetFromJsonAsync<int>("api/Factultad/EliminarFacultad/" + data);
+        if (respuesta == 1)
+        {
+            data = "";
+            listaFacultades = await http.GetFromJsonAsync<FacultadCls[]>("api/Facultad/Filtrar/" + data);
+            tipoMsg = "alert alert-primary";
+            msg = "Facultad eliminada con exito";
+        }
+        else
+        {
+            tipoMsg = "alert alert-danger";
+            msg = "Accion no pudo procesarse, es posible que la facultad ya cuente con registros";
+        }
+    }
+}

@@ -1,0 +1,48 @@
+﻿@using RegistroAcademicoApp.Shared
+@inject HttpClient http
+@inject IRepositorio repositorio
+@inject NavigationManager navigationManager
+
+<EditForm Model="@facultadCls" OnValidSubmit="GuardarDatos">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (facultadCls.FacultdadId != 0)
+    {
+        <div class="form-group">
+            <label>Id Facultad</label>
+            <input class="form-control" readonly type="number" @bind="facultadCls.FacultdadId" />
+        </div>
+    }
+
+    <div class="form-group">
+        <label>Ingrese Nombre de Facultad</label>
+        <InputText class="form-check form-control"
+                   @bind-Value="facultadCls.FacultadNombre" />
+    </div>
+
+    <input type="submit" value="Guardar" class="btn btn-primary" />
+    <NavLink href="/ListaFacultad">
+        <input type="button" value="Regresar" class="btn btn-danger" />
+    </NavLink>
+</EditForm>
+
+
+@code { 
+    [Parameter]
+    public FacultadCls facultadCls { get; set; } = new FacultadCls();
+    public async Task GuardarDatos()
+    {
+
+        var response = await repositorio.Post("api/Facultad/Guardar", facultadCls);
+        if (response.Error)
+        {
+            var body = await response.HttpResponseMessage.Content.ReadAsStringAsync();
+            Console.WriteLine(body);
+        }
+        else
+        {
+            navigationManager.NavigateTo("/ListaFacultad");
+        }
+
+    } 
+}
